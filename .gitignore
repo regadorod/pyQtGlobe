@@ -1,0 +1,15 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# venv
+venv/
+
+# test files
+globe.py
+main.py
+newTest.py
+qtglobe.py
+test.py
+world.jpg
