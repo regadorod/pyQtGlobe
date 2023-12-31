@@ -2,9 +2,9 @@ import sys
 import math
 import numpy as np
 import pickle
-from PIL import Image, ImageQt
+
 from PyQt5.QtCore import pyqtSignal, QPoint, QSize, Qt
-from PyQt5.QtGui import QColor, QOpenGLVersionProfile
+from PyQt5.QtGui import QColor, QOpenGLVersionProfile, QWheelEvent
 from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QOpenGLWidget, QWidget)
 
 class Window(QWidget):
@@ -30,6 +30,7 @@ class GLWidget(QOpenGLWidget):
         self.zRot = 0
 
         self.lastPos = QPoint()
+        self.zoomFactor = 1.0
 
         self.main = QColor.fromCmykF(0.40, 0.0, 1.0, 0.0)
         self.clear = QColor.fromCmykF(1.0, 1.0, 1.0, 0.0)
@@ -91,6 +92,7 @@ class GLWidget(QOpenGLWidget):
         self.gl.glClear(self.gl.GL_COLOR_BUFFER_BIT | self.gl.GL_DEPTH_BUFFER_BIT)
         self.gl.glLoadIdentity()
         self.gl.glTranslated(0.0, 0.0, -10.0)
+        self.gl.glScaled(1 * self.zoomFactor, 1 * self.zoomFactor, 0.1 * self.zoomFactor)
         self.gl.glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
         self.gl.glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
         self.gl.glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
@@ -128,6 +130,16 @@ class GLWidget(QOpenGLWidget):
             self.setZRotation(self.zRot + 8 * dx)
 
         self.lastPos = event.pos()
+
+    def wheelEvent(self, event):
+        scroll = event.angleDelta()
+        if scroll.y() > 0:
+            self.zoomFactor += 0.1
+            self.update()
+        else:
+            self.zoomFactor -= 0.1
+            self.update()
+
 
     def makeObject(self):
         genList = self.gl.glGenLists(1)
@@ -193,7 +205,7 @@ class GLWidget(QOpenGLWidget):
 
     def setColor(self, c):
         self.gl.glColor4f(c.redF(), c.greenF(), c.blueF(), c.alphaF())
-
+    
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
